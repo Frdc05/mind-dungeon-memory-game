@@ -14,7 +14,7 @@ export default function PauseModal({ onResume, onRestart }) {
                 </button>
                 
                 <button
-                    onClick={onRestart}
+                    onClick={() => window.location.reload()}
                     className="w-full bg-yellow-400 text-white py-2 rounded-lg hover:bg-yellow-500"
                 >
                     Restart

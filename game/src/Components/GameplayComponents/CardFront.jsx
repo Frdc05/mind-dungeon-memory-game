@@ -1,11 +1,12 @@
 import React from 'react';
-import Question from '../Icon/Question';
 
 export default function CardFront() {
     return (
-        <div className="card-face card-front w-full h-full bg-contain bg-center bg-no-repeat"
-            style={{ backgroundImage: "url('/Card/Front.png')" }}>
+        <div className="card-face card-front w-full h-full flex items-center justify-center overflow-hidden">
+            <div
+                className="w-full h-full bg-center bg-no-repeat bg-contain"
+                style={{ backgroundImage: "url('/Card/Front.png')" }}
+            />
         </div>
     );
-};
-
+}

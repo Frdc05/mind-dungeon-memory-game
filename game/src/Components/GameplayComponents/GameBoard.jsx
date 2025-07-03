@@ -4,6 +4,7 @@ import CardFront from './CardFront';
 import CardBack from './CardBack';
 import PauseModal from './PauseModal';
 import LevelCompletePopup from './LevelCompleteModal';
+import GameEndModal from './EndGameModal';
 import levelData from './levels/levelData';
 
 export default function GameBoard() {
@@ -17,10 +18,11 @@ export default function GameBoard() {
     const [isGameFinished, setIsGameFinished] = useState(false);
     const [startTime, setStartTime] = useState(Date.now());
     const [elapsedTime, setElapsedTime] = useState(0);
+    const [wrongCards, setWrongCards] = useState([]);
 
     const maxLevel = Object.keys(levelData).length;
     const gridCols = levelData[level]?.grid || 4;
-    const bgImage = levelData[level]?.background
+    const bgImage = levelData[level]?.background;
 
     useEffect(() => {
         const data = levelData[level];
@@ -38,26 +40,32 @@ export default function GameBoard() {
         if (flipped.length === 2) {
             const [firstIdx, secondIdx] = flipped;
             if (cards[firstIdx].label === cards[secondIdx].label) {
-                setMatched((prev) => [...prev, firstIdx, secondIdx]);
-                setScore((prev) => prev + 1);
-                setFlipped([]);
+                setTimeout(() => {
+                    setMatched((prev) => [...prev, firstIdx, secondIdx]);
+                    setScore((prev) => prev + 1);
+                    setFlipped([]);
+                }, 600);
             } else {
-                setTimeout(() => setFlipped([]), 1000);
+                setWrongCards([firstIdx, secondIdx]);
+                setTimeout(() => {
+                    setFlipped([]);
+                    setWrongCards([]);
+                }, 1000);
             }
         }
     }, [flipped, cards]);
 
     useEffect(() => {
         if (cards.length > 0 && matched.length === cards.length) {
-            if (level === maxLevel) {
+            if (level < maxLevel && levelData[level + 1]) {
+                setTimeout(() => setShowLevelPopup(true), 500);
+            } else {
                 const endTime = Date.now();
                 setElapsedTime(Math.floor((endTime - startTime) / 1000));
                 setTimeout(() => setIsGameFinished(true), 500);
-            } else {
-                setTimeout(() => setShowLevelPopup(true), 500);
             }
         }
-    }, [matched, cards]);
+    }, [matched, cards, level]);
 
     const handleFlip = (index) => {
         if (isPaused || flipped.includes(index) || matched.includes(index) || flipped.length === 2) return;
@@ -73,64 +81,62 @@ export default function GameBoard() {
         setStartTime(Date.now());
     };
 
-
-    // Ukuran dinamis kartu
-    const cardSize = 600 / Math.ceil(cards.length / gridCols); // max tinggi container = 600px
+    const cardSize = 600 / Math.ceil(cards.length / gridCols);
 
     return (
         <div
             className="w-full min-h-screen p-4 font-jersey text-center bg-cover bg-center flex flex-col items-center"
             style={{ backgroundImage: `url(${bgImage})` }}
         >
-            <HeaderBar score={score} onPause={() => setIsPaused(true)} />
+            <HeaderBar score={score} onPause={() => setIsPaused(true)} timeLeft={0} stage={level} />
+            <div className="flex items-center justify-between w-full max-w-4xl mx-auto">
+                <div><h1>a</h1></div>
+                <div className="w-[800px] h-[600px] border-4 border-gray-800 mt-4 flex items-center justify-center overflow-hidden">
+                    <div
+                        className="grid gap-2"
+                        style={{
+                            gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
+                            width: '100%',
+                            height: '100%',
+                            justifyItems: 'center',
+                            alignItems: 'center',
+                        }}
+                    >
+                        {cards.map((card, index) => {
+                            const isFlipped = flipped.includes(index) || matched.includes(index);
+                            const isMatched = matched.includes(index);
+                            const isWrong = wrongCards.includes(index);
 
-            <div className="w-[800px] h-[600px] border-4 border-gray-800 mt-4 flex items-center justify-center overflow-hidden">
-                <div
-                    className="grid gap-2"
-                    style={{
-                        gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
-                        width: '100%',
-                        height: '100%',
-                        justifyItems: 'center',
-                        alignItems: 'center',
-                    }}
-                >
-                    {cards.map((card, index) => {
-                        const isFlipped = flipped.includes(index) || matched.includes(index);
-                        return (
-                            <div
-                                key={card.uid}
-                                className="aspect-[3/4] flex items-center justify-center perspective"
-                                style={{
-                                    width: `${cardSize}px`,
-                                    maxWidth: '100px',
-                                }}
-                                onClick={() => handleFlip(index)}
-                            >
-                                <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`}>
-                                    <CardFront />
-                                    <CardBack image={card.image} />
+                            return (
+                                <div
+                                    key={card.uid}
+                                    className={`aspect-[3/4] flex items-center justify-center perspective transition-opacity duration-500 ease-out pointer cursor-pointer
+                                        ${isMatched ? 'animate-fade-out pointer-events-none' : ''} 
+                                        ${isWrong ? 'animate-shake' : ''}
+                                    `}
+                                    style={{ width: `${cardSize}px`, maxWidth: '100px' }}
+                                    onClick={() => handleFlip(index)}
+                                >
+                                    <div
+                                        className={`relative w-full h-full [transform-style:preserve-3d] transition-transform duration-500 ease-in-out 
+                                            ${isFlipped ? '[transform:rotateY(180deg)]' : ''}
+                                        `}
+                                    >
+                                        <CardFront />
+                                        <CardBack image={card.image} />
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
+                    </div>
                 </div>
+                <div><h1>b</h1></div>
             </div>
 
             {isPaused && <PauseModal onResume={() => setIsPaused(false)} onRestart={handleRestart} />}
-                
-            <LevelCompletePopup
-                isOpen={showLevelPopup}
-                level={level}
-                onAutoClose={handleNextLevel}
-            />
-
+            <LevelCompletePopup isOpen={showLevelPopup} level={level} onAutoClose={handleNextLevel} />
             {isGameFinished && (
-                <GameEndModal
-                    score={score}
-                    timeInSeconds={elapsedTime}
-                    onRestart={handleRestart}
-                />
+                <GameEndModal score={score} timeInSeconds={elapsedTime} onRestart={handleRestart} />
             )}
         </div>
     );

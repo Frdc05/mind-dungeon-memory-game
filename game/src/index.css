@@ -6,7 +6,7 @@
 @tailwind utilities;
 
 .perspective {
-    perspective: 1000px;
+    perspective: 400px;
 }
 
 .flip-card-inner {
