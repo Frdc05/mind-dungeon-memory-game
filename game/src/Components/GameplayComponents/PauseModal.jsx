@@ -3,7 +3,7 @@ import React from 'react';
 export default function PauseModal({ onResume, onRestart }) {
     return (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center">
-            <div className="bg-white p-6 rounded-xl shadow-lg w-80 space-y-4 text-center">
+            <div className="bg-white p-8 shadow-lg w-80 space-y-4 text-center">
                 <h2 className="text-2xl font-bold text-purple-700">Game Paused</h2>
                 
                 <button

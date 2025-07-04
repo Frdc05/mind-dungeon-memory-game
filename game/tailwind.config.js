@@ -29,6 +29,14 @@ export default {
           '0%': { transform: 'rotateY(180deg)' },
           '100%': { transform: 'rotateY(0deg)' },
         },
+
+        bounceIn: {
+          '0%': { transform: 'scale(0.9)', opacity: 0 },
+          '60%': { transform: 'scale(1.05)', opacity: 1 },
+          '100%': { transform: 'scale(1)', opacity: 1 },
+        },
+
+        
       },
 
       animation: {
@@ -36,6 +44,7 @@ export default {
         shake: 'shake 0.4s ease-in-out',
         flip: 'flip 0.6s ease-in-out forwards',
         flipBack: 'flipBack 0.6s ease-in-out forwards',
+        'bounce-in': 'bounceIn 0.4s ease-out',
       },
 
       fontFamily: {
@@ -47,5 +56,13 @@ export default {
 
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        '.image-pixelated': {
+          imageRendering: 'pixelated',
+        },
+      });
+    },
+  ],
 }
