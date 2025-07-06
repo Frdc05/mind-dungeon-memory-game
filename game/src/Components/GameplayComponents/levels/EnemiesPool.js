@@ -2,33 +2,21 @@
 const enemiesPool = [
   {
     id: 0,
-    name: 'Slime',
-    image: '/sprites/enemies/slime.png',
+    name: 'Centipede',
+    image: '/Character/Centipede/Centipede.png',
     description: 'A weak but persistent enemy.',
   },
   {
     id: 1,
-    name: 'Goblin',
-    image: '/sprites/enemies/goblin.png',
+    name: 'Battle Turtle',
+    image: '/Character/BattleTurtle/Battle_turtle.png',
     description: 'Fast and mischievous.',
   },
   {
     id: 2,
-    name: 'Skeleton',
-    image: '/sprites/enemies/skeleton.png',
+    name: 'Big Bloated ',
+    image: '/Character/BigBloated/Big_bloated.png',
     description: 'Rattling bones with cold revenge.',
-  },
-  {
-    id: 3,
-    name: 'Dragonling',
-    image: '/sprites/enemies/dragonling.png',
-    description: 'Small but dangerous dragon baby.',
-  },
-  {
-    id: 4,
-    name: 'Necromancer',
-    image: '/sprites/enemies/necromancer.png',
-    description: 'Raises others to fight for him.',
   },
 ];
 

@@ -1,3 +1,6 @@
+// WelcomeScreen.jsx
+// Komponen layar pembuka utama Mind Dungeon Memory Game
+// Menampilkan menu utama, rules, settings, dan setup game, serta mengelola musik latar
 import React, { useContext, useEffect, useState } from 'react';
 import Rules from './MenusComponents/Rules';
 import Settings from './MenusComponents/Settings';
@@ -8,17 +11,20 @@ import GameSetup from './MenusComponents/GameSetup';
 import { AudioContext } from '../Context/AudioContext';
 
 export default function WelcomeScreen() {
-    const [menu, setMenu] = useState('main');
-    const { switchTrack, playMusic, currentTrack } = useContext(AudioContext);
-    const [hasPlayed, setHasPlayed] = useState(false);
+    // ===== STATE MENU DAN AUDIO =====
+    const [menu, setMenu] = useState('main'); // Menu yang sedang aktif: main, play, rules, settings
+    const { switchTrack, playMusic, currentTrack } = useContext(AudioContext); // Context audio
+    const [hasPlayed, setHasPlayed] = useState(false); // Cegah pemutaran musik ganda
     
+    // Set musik latar ke BGM saat masuk, dan kembalikan ke battle saat keluar
     useEffect(() => {
-            switchTrack('bgm', { reset: true });
-            return () => {
-                switchTrack('batlle', { reset: false });
-            };
+        switchTrack('bgm', { reset: true });
+        return () => {
+            switchTrack('batlle', { reset: false });
+        };
     }, []);
 
+    // Pastikan musik BGM diputar hanya sekali saat layar welcome
     useEffect(() => {
         if (!hasPlayed) {
             if (currentTrack !== 'bgm') {
@@ -30,8 +36,10 @@ export default function WelcomeScreen() {
         }
     }, [hasPlayed, currentTrack, switchTrack, playMusic]);
 
+    // ===== RENDER UI LAYAR WELCOME DAN MENU =====
     return (
         <div className="relative w-full min-h-screen overflow-hidden font-jersey">
+            {/* Background utama */}
             <div className="absolute inset-0 w-full h-full">
                 <img
                     src="/Background/NatureBg/nature_5/origbig.png"
@@ -40,7 +48,9 @@ export default function WelcomeScreen() {
                 />
             </div>
 
+            {/* Konten utama dan menu */}
             <div className="relative z-50 flex flex-col items-center justify-center min-h-screen text-center text-white px-6 sm:px-10 md:px-16">
+                {/* Menu utama */}
                 {menu === 'main' && (
                     <>
                         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-amber-300 drop-shadow-[0_3px_2px_rgba(0,0,0,0.7)] mb-4">
@@ -50,6 +60,7 @@ export default function WelcomeScreen() {
                             Match the card, beat the monster and be a hero!
                         </p>
                         <div className="flex gap-6">
+                            {/* Tombol Rules */}
                             <div className="flex flex-col items-center group">
                                 <button
                                     onClick={() => setMenu('rules')}
@@ -60,6 +71,7 @@ export default function WelcomeScreen() {
                                 <span className="text-lg sm:text-xl mt-2 text-yellow-200 group-hover:text-yellow-100 transition-colors duration-150">Game Rules</span>
                             </div>
 
+                            {/* Tombol Play */}
                             <div className="flex flex-col items-center group">
                                 <button
                                     onClick={() => setMenu('play')}
@@ -70,6 +82,7 @@ export default function WelcomeScreen() {
                                 <span className="text-lg sm:text-xl mt-2 text-yellow-200 group-hover:text-yellow-100 transition-colors duration-150">Play Game</span>
                             </div>
 
+                            {/* Tombol Settings */}
                             <div className="flex flex-col items-center group">
                                 <button
                                     onClick={() => setMenu('settings')}
@@ -83,6 +96,7 @@ export default function WelcomeScreen() {
                     </>
                 )}
 
+                {/* Menu Play, Rules, Settings */}
                 {menu === 'play' && <GameSetup onBack={() => setMenu('main')} />}
                 {menu === 'rules' && <Rules onBack={() => setMenu('main')} />}
                 {menu === 'settings' && <Settings onBack={() => setMenu('main')} />}

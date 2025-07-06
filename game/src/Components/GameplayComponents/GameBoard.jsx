@@ -1,3 +1,6 @@
+// GameBoard.jsx
+// Komponen utama papan permainan untuk Mind Dungeon Memory Game
+// Mengelola state permainan, logika level, kartu, musuh, skor, waktu, efek suara, dan UI utama
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
 import HeaderBar from './HeaderBar';
@@ -15,42 +18,47 @@ import Heart from '../Icon/Heart';
 import { AudioContext } from '../../Context/AudioContext';
 
 export default function GameBoard() {
-    const [level, setLevel] = useState(1);
-    const [cards, setCards] = useState([]);
-    const [flipped, setFlipped] = useState([]);
-    const [matched, setMatched] = useState([]);
-    const [score, setScore] = useState(0);
-    const [isPaused, setIsPaused] = useState(false);
-    const [showLevelPopup, setShowLevelPopup] = useState(false);
-    const [isGameFinished, setIsGameFinished] = useState(false);
-    const [elapsedTime, setElapsedTime] = useState(180);
-    const [wrongCards, setWrongCards] = useState([]);
-    const [playerHealth, setPlayerHealth] = useState(3);
-    const [showGameOver, setShowGameOver] = useState(false);
-    const [attackEffect, setAttackEffect] = useState('');
-    const [defenseEffect, setDefenseEffect] = useState('');
-    const [streak, setStreak] = useState(0);
-    const [isReady, setIsReady] = useState(false);
-    const [finalTime, setFinalTime] = useState(0);
-    const [lastCorrectTime, setLastCorrectTime] = useState(null);
-    const [gameSessionId, setGameSessionId] = useState(0);
-    const [sfxEnabled, setSfxEnabled] = useState(true);
-    const [comboMessage, setComboMessage] = useState('');
-    const [enemy, setEnemy] = useState(null);
-    const location = useLocation();
-    const [playerName, setPlayerName] = useState('');
-    const [avatarIndex, setAvatarIndex] = useState(0);
-    const { switchTrack } = useContext(AudioContext);
+  // ===== STATE PERMAINAN =====
+  const [level, setLevel] = useState(1); // Level permainan saat ini
+  const [cards, setCards] = useState([]); // Semua kartu dalam level saat ini
+  const [flipped, setFlipped] = useState([]); // Indeks kartu yang sedang terbuka
+  const [matched, setMatched] = useState([]); // Indeks kartu yang sudah dicocokkan
+  const [score, setScore] = useState(0); // Total skor pemain
+  const [isPaused, setIsPaused] = useState(false); // Status pause permainan
+  const [showLevelPopup, setShowLevelPopup] = useState(false); // Popup ketika menyelesaikan level
+  const [isGameFinished, setIsGameFinished] = useState(false); // Status apakah game sudah selesai seluruh levelnya
+  const [elapsedTime, setElapsedTime] = useState(180); // Sisa waktu permainan (detik)
+  const [wrongCards, setWrongCards] = useState([]); // Indeks kartu yang salah dicocokkan
+  const [playerHealth, setPlayerHealth] = useState(3); // Jumlah nyawa pemain (maksimal 3)
+  const [showGameOver, setShowGameOver] = useState(false); // Status apakah modal game over harus ditampilkan
+  const [attackEffect, setAttackEffect] = useState(''); // Efek animasi serangan ke musuh
+  const [defenseEffect, setDefenseEffect] = useState(''); // Efek animasi menerima kerusakan
+  const [streak, setStreak] = useState(0); // Jumlah streak (cocok beruntun)
+  const [isReady, setIsReady] = useState(false); // Apakah permainan sudah siap dimulai
+  const [finalTime, setFinalTime] = useState(0); // Waktu total menyelesaikan game
+  const [lastCorrectTime, setLastCorrectTime] = useState(null); // Timestamp pencocokan kartu terakhir
+  const [gameSessionId, setGameSessionId] = useState(0); // ID sesi game untuk reset
+  const [sfxEnabled, setSfxEnabled] = useState(true); // Status efek suara aktif
+  const [comboMessage, setComboMessage] = useState(''); // Pesan combo saat streak
+  const [enemy, setEnemy] = useState(null); // Data musuh untuk level saat ini
 
-    const maxLevel = levelData.length;
-    const bgImage = levelData[level - 1]?.backgroundImage || '';
+  // ===== DATA PEMAIN DAN KONTEXT AUDIO =====
+  const location = useLocation();
+  const [playerName, setPlayerName] = useState(''); // Nama pemain
+  const [avatarIndex, setAvatarIndex] = useState(0); // Indeks avatar pemain
+  const { switchTrack } = useContext(AudioContext); // Fungsi ganti musik latar
 
-    const handleRestartAndClose = () => {
-        setIsPaused(false);       
-        handleRestart();          // Reset game (fungsi reset yang sudah ada)
-    };
+  // ===== KONSTANTA LEVEL DAN BACKGROUND =====
+  const maxLevel = levelData.length;
+  const bgImage = levelData[level - 1]?.backgroundImage || '';
 
+  // ===== HANDLER UNTUK MODAL PAUSE =====
+  const handleRestartAndClose = () => {
+    setIsPaused(false);       
+    handleRestart();          // Reset game (fungsi reset yang sudah ada)
+  };
 
+  // Ambil nama dan avatar dari query string URL
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const name = params.get('name') || 'Player';
@@ -59,6 +67,7 @@ export default function GameBoard() {
     setAvatarIndex(avatar);
   }, [location.search]);
 
+  // Fungsi untuk memainkan efek suara sesuai event
   const playSound = (type) => {
     if (!sfxEnabled) return;
     const sounds = {
@@ -70,27 +79,32 @@ export default function GameBoard() {
     sounds[type]?.play();
   };
 
+  // Ganti musik latar ke battle saat game dimulai, kembali ke bgm saat keluar
   useEffect(() => {
     switchTrack('battle', { reset: true });
     return () => switchTrack('bgm', { reset: false });
   }, []);
 
+  // Setup kartu dan musuh baru setiap kali level/gamesession berubah
   useEffect(() => {
     const data = levelData[level - 1];
     if (data) {
+      // Pilih dan acak kartu
       const shuffledPool = [...cardPool].sort(() => Math.random() - 0.5);
       const selected = shuffledPool.slice(0, data.cardCount);
       const duplicated = [...selected, ...selected];
       const shuffled = duplicated.sort(() => Math.random() - 0.5).map((card, index) => ({ ...card, uid: index }));
       setCards(shuffled);
-      setFlipped(shuffled.map((_, index) => index));
+      setFlipped(shuffled.map((_, index) => index)); // Tampilkan semua kartu sebentar
       setMatched([]);
       setShowLevelPopup(false);
       setIsReady(false);
 
+      // Pilih musuh acak
       const randomEnemy = enemiesPool[Math.floor(Math.random() * enemiesPool.length)];
       setEnemy(randomEnemy);
 
+      // Setelah 3 detik, tutup semua kartu dan mulai game
       setTimeout(() => {
         setFlipped([]);
         setIsReady(true);
@@ -98,6 +112,7 @@ export default function GameBoard() {
     }
   }, [level, gameSessionId]);
 
+  // Timer utama permainan, mengurangi waktu dan nyawa setiap menit
   useEffect(() => {
     if (!isReady || isPaused) return;
     const timer = setInterval(() => {
@@ -109,6 +124,7 @@ export default function GameBoard() {
           playSound('gameover');
           return 0;
         }
+        // Setiap 60 detik, kurangi nyawa
         if (updated % 60 === 0 && updated !== 180) {
           setPlayerHealth((hp) => {
             if (hp <= 1) {
@@ -125,6 +141,7 @@ export default function GameBoard() {
     return () => clearInterval(timer);
   }, [isReady, isPaused]);
 
+  // Logika pencocokan kartu dan penilaian skor/streak
   useEffect(() => {
     if (!isReady) return;
     if (flipped.length === 2) {
@@ -168,6 +185,7 @@ export default function GameBoard() {
     }
   }, [flipped, cards, isReady]);
 
+  // Cek apakah semua kartu sudah dicocokkan, lanjut ke level berikutnya atau selesai
   useEffect(() => {
     if (cards.length > 0 && matched.length === cards.length) {
       if (level < maxLevel) {
@@ -184,11 +202,13 @@ export default function GameBoard() {
     }
   }, [matched, cards, level, maxLevel, isGameFinished]);
 
+  // Handler untuk membalik kartu
   const handleFlip = (index) => {
     if (!isReady || isPaused || flipped.includes(index) || matched.includes(index) || flipped.length === 2) return;
     setFlipped([...flipped, index]);
   };
 
+  // Handler untuk lanjut ke level berikutnya
   const handleNextLevel = () => {
     setShowLevelPopup(false);
     setLevel((prev) => prev + 1);
@@ -200,6 +220,7 @@ export default function GameBoard() {
     setIsReady(false);
   };
 
+  // Handler untuk restart game dari awal
   const handleRestart = () => {
     setScore(0);
     setLevel(1);
@@ -210,8 +231,10 @@ export default function GameBoard() {
     setGameSessionId((prev) => prev + 1);
   };
 
+  // Handler untuk melanjutkan game dari pause
   const handleResume = () => setIsPaused(false);
 
+  // Hitung jumlah kolom grid dan ukuran kartu dinamis
   const gridCols = cards.length <= 4 ? 2 : cards.length <= 6 ? 3 : cards.length <= 8 ? 4 : 5;
   const cardSize = Math.min(120, 600 / gridCols);
   const progress = cards.length > 0 ? matched.length / cards.length : 0;
@@ -274,7 +297,7 @@ export default function GameBoard() {
           {enemy && (
             <>
               <p className='w-full font-jersey text-yellow-200 text-4xl'>{enemy.name}</p>
-              <img src={enemy.image} alt={enemy.name} className={`w-28 h-28 object-contain ${attackEffect}`} />
+              <img src={enemy.image} alt={enemy.name} className={`w-36 h-36 object-contain ${attackEffect}`} />
             </>
           )}
         </div>
