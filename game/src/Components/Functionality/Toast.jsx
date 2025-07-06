@@ -18,7 +18,7 @@ export default function Toast({ message, type = 'info', duration = 3000, onClose
     // Manual close handler
     const handleManualClose = () => {
         setIsClosing(true);
-        setTimeout(() => onClose(), 500); // Wait fade out before remove
+        setTimeout(() => onClose(), 300); // Wait fade out before remove
     };
 
     return (

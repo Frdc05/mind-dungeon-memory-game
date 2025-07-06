@@ -1,0 +1,13 @@
+export default function Clock({ w , h , className = "" }) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            style={{ width: `${w}px`, height: `${h}px` }}
+            className={className}
+        >
+            <path d="M23 8V10H22V11H21V12H20V13H19V14H18V19H19V23H17V22H15V21H13V20H11V21H9V22H7V23H5V19H6V14H5V13H4V12H3V11H2V10H1V8H8V6H9V4H10V2H11V1H13V2H14V4H15V6H16V8H23Z" />
+        </svg>
+    );
+}

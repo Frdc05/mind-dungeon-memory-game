@@ -48,8 +48,7 @@ export default {
       },
 
       fontFamily: {
-        rubik: ['"Rubik"', 'sans-serif'],
-        jersey: ['"Jersey 25"', 'cursive'],
+        jersey: ['"Jersey 10"', 'cursive'],
         pixelify: ['"Pixelify Sans"', 'sans-serif'],
       },
 

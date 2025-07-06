@@ -1,6 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import Restart from '../Icon/Restart';
+import Cross from '../Icon/Cross';
+import Clock from '../Icon/Clock';
 
-export default function GameEndModal({ score, timeInSeconds}) {
+export default function GameEndModal({ score, timeInSeconds, onRestart }) {
+    const [displayedScore, setDisplayedScore] = useState(0);
+
+    useEffect(() => {
+        let current = 0;
+        const duration = 1000;
+        const steps = 40;
+        const increment = Math.ceil(score / steps);
+        const intervalTime = duration / steps;
+
+        const interval = setInterval(() => {
+            current += increment;
+            if (current >= score) {
+                current = score;
+                clearInterval(interval);
+            }
+            setDisplayedScore(current);
+        }, intervalTime);
+
+        return () => clearInterval(interval);
+    }, [score]);
+
     const formatTime = (seconds) => {
         const m = String(Math.floor(seconds / 60)).padStart(2, '0');
         const s = String(seconds % 60).padStart(2, '0');
@@ -8,27 +32,40 @@ export default function GameEndModal({ score, timeInSeconds}) {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-xl shadow-lg text-center space-y-4">
-                <h2 className="text-2xl font-bold"> 🎉</h2>
-                <p>Final Score: <span className="font-bold text-purple-600">{score}</span></p>
-                <p>Total Time: <span className="font-bold text-blue-600">{formatTime(timeInSeconds)}</span></p>
-                
-                {/* Button Play Again */}
-                <button
-                    onClick={onRestart}
-                    className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
-                >
-                    Play Again
-                </button>
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 font-jersey">
+            <div className="p-8 shadow-lg w-80 rounded-xl space-y-6 text-center">
+                <div className="flex items-center justify-center gap-2">
+                    <h2 className="text-5xl font-bold text-lime-400">🎉 Congratulations!</h2>
+                </div>
 
-                {/* Button Back to Menu  */}
-                <button 
-                    onClick={() => window.location.reload()}
-                    className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
-                >
-                    Back to Menu
-                </button>
+                <div className="space-y-2">
+                    <p className="text-xl text-yellow-200">Your final score is:</p>
+                    <p className="text-4xl font-bold text-purple-300 animate-pulse">
+                        {displayedScore} point(s)
+                    </p>
+                    <div className="flex justify-center items-center gap-2 text-yellow-100">
+                        <Clock className="w-5 h-5 text-yellow-300" />
+                        <span className="text-md">Time: <span className="font-bold">{formatTime(timeInSeconds)}</span></span>
+                    </div>
+                </div>
+
+                <div className="flex justify-center gap-6 mt-2">
+                    <button
+                        onClick={onRestart}
+                        className="bg-yellow-300 hover:bg-yellow-400 text-yellow-900 p-4 rounded-full shadow-inner transform hover:scale-110 active:translate-y-[2px] transition-all duration-150"
+                        title="Restart Game"
+                    >
+                        <Restart w={24} h={24} className="text-yellow-900" />
+                    </button>
+
+                    <button
+                        onClick={() => window.location.href = '/'}
+                        className="bg-yellow-300 hover:bg-yellow-400 text-yellow-900 p-4 rounded-full shadow-inner transform hover:scale-110 active:translate-y-[2px] transition-all duration-150"
+                        title="Exit to Lobby"
+                    >
+                        <Cross w={24} h={24} className="text-yellow-900" />
+                    </button>
+                </div>
             </div>
         </div>
     );

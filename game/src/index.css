@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Jersey+25&family=Pixelify+Sans:wght@400..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Jersey+25&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&family=Pixelify+Sans:wght@400..700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -30,10 +29,7 @@
 }
 
 .card-back {
+    overflow: hidden;
     transform: rotateY(180deg);
-    background-color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
