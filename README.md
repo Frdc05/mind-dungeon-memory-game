@@ -1,9 +1,9 @@
 # Mind Dungeon
 
 ## Project Overview
-Mind Dungeon adalah memory card game berbasis web bertema pixel dungeon yang menantang pemain untuk mencocokkan pasangan kartu sambil menghindari kekalahan akibat kehabisan waktu atau health point. Proyek ini bertujuan menjadi studi nyata kolaborasi antara pengembang manusia dengan bantuan AI (IBM Granite Model) dalam menciptakan aplikasi interaktif dengan struktur modular, performa optimal, dan desain visual konsisten.
+Mind Dungeon adalah memory card game berbasis web bertema pixel dungeon yang menantang pemain untuk mencocokkan pasangan kartu sambil menghindari kekalahan akibat kehabisan waktu atau health point. Proyek ini bertujuan menjadi studi nyata kolaborasi antara pengembang manusia dengan bantuan IBM Granite Model dalam menciptakan aplikasi interaktif dengan struktur modular, performa optimal, dan desain visual konsisten.
 
-Permasalahan utama yang diangkat adalah kompleksitas pengembangan aplikasi game real-time berbasis React — mencakup manajemen state antar komponen, animasi interaktif, logika permainan yang terus berkembang (leveling system), serta kebutuhan untuk menjaga struktur kode tetap scalable dan maintainable. Disini AI secara aktif selama proses pembangunan, menjadikan proyek ini sebagai eksperimen nyata penerapan AI dalam code generation dan optimasi sistem frontend modern.
+Permasalahan utama yang diangkat adalah kompleksitas pengembangan aplikasi game berbasis ReactJS dengan mencakup manajemen state antar komponen, animasi interaktif, logika permainan yang terus berkembang (leveling system), serta kebutuhan untuk menjaga struktur kode tetap scalable dan maintainable. Disini Granite secara aktif membantu seluruh proses development sekaligus menunjukkan kemampuan Granite Model dalam code generation dan optimasi sistem frontend modern.
 
 ## Teknologi yang Digunakan
 
